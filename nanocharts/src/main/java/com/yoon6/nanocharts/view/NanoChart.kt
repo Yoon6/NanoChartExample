@@ -13,9 +13,9 @@ import com.yoon6.nanocharts.model.BarPrices
 
 class NanoChart(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
     private var bars = listOf<BarPrices>()
-    private var barSpacing = 20f;
-    private var scrollOffset = 0f;
-    private var lastTouchX = 0f;
+    private var barSpacing = 20f
+    private var scrollOffset = 0f
+    private var lastTouchX = 0f
     private val scaleDetector = ScaleGestureDetector(context, ScaleListener())
 
     private val wickPaint = Paint().apply {
@@ -46,7 +46,7 @@ class NanoChart(context: Context, attrs: AttributeSet? = null) : View(context, a
     // Visible range만 계산
     private fun getVisibleRange(): Pair<Int, Int> {
         val startIndex = (scrollOffset / barSpacing).toInt()
-            .coerceIn(0, bars.size - 1)
+            .coerceIn(0, bars.size - 20)
 
         val visibleCount = (width / barSpacing).toInt() + 2
         val endIndex = (startIndex + visibleCount)
@@ -67,8 +67,8 @@ class NanoChart(context: Context, attrs: AttributeSet? = null) : View(context, a
                 if (!scaleDetector.isInProgress) {
                     // Pan
                     val dx = event.x - lastTouchX
-                    scrollOffset = (scrollOffset - dx)
-                        .coerceIn(0f, (bars.size * barSpacing - width).coerceAtLeast(0f))
+                    val maxX = (barSpacing * bars.size - width).coerceAtLeast(0f)
+                    scrollOffset = (scrollOffset - dx).coerceIn(0f, maxX)
 
                     invalidate()
                     lastTouchX = event.x
@@ -107,7 +107,7 @@ class NanoChart(context: Context, attrs: AttributeSet? = null) : View(context, a
 
         visibleBars.forEachIndexed { index, candle ->
 
-            val x = index * barSpacing - scrollOffset;
+            val x = index * barSpacing + barSpacing / 2
 
             val highY = priceToY(candle.high, minPrice, maxPrice)
             val lowY = priceToY(candle.low, minPrice, maxPrice)
